@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"fmt"
+
 	"github.com/aceld/zinx/ziface"
 	"github.com/fred29910/xizexcample/enhanced_router"
-	"github.com/fred29910/xizexcample/proto"
+	messages "github.com/fred29910/xizexcample/proto"
 	"google.golang.org/protobuf/proto"
 )
 

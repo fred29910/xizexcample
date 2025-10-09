@@ -10,7 +10,7 @@ func main() {
 	s := znet.NewServer()
 
 	// 2. Enable TLS
-	s.SetServerCert("server.crt", "server.key")
+	// s.SetServerCert("server.crt", "server.key")
 
 	// 3. Add custom routers
 	s.AddRouter(1, &routers.AuthRouter{})
