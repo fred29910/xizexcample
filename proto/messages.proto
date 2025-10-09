@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package messages;
+
+option go_package = "github.com/fred29910/xizexcample/proto";
+
+// 通用请求消息
+message Request {
+  uint32 msg_id = 1;      // 消息ID，用于路由
+  bytes data = 2;         // 业务数据
+}
+
+// 通用响应消息
+message Response {
+  uint32 code = 1;        // 响应码（0:成功）
+  string message = 2;     // 响应信息
+  bytes data = 3;         // 业务数据
+}
+
+// 用户认证请求
+message AuthRequest {
+  string username = 1;
+  string password = 2;
+}
+
+// 用户认证响应
+message AuthResponse {
+  string token = 1;
+}
+
+// 消息推送请求
+message PushRequest {
+  string target_user = 1;
+  string content = 2;
+}
+
+// 消息推送响应
+message PushResponse {
+  bool success = 1;
+}

@@ -1,0 +1,11 @@
+metrics:
+  enabled: true
+  path: "/metrics"
+  addr: ":9090"
+
+otlp:
+  enabled: true
+  endpoint: "localhost:4317"
+  protocol: "grpc"
+  service_name: "my-zinx-service"
+  sample_ratio: 1.0
