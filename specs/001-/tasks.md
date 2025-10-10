@@ -19,12 +19,12 @@
 
 **Purpose**: Project initialization and basic structure.
 
-- [ ] T001 [P] Initialize Go module with `go mod init`.
-- [ ] T002 [P] Add Zinx and Protobuf dependencies to `go.mod`.
-- [ ] T003 [P] Create the project directory structure as defined in `plan.md`.
-- [ ] T004 [P] Configure linting and formatting tools (`gofmt`, `golint`) and setup pre-commit hooks.
-- [ ] T005 [P] Configure unit and E2E testing frameworks.
-- [ ] T006 [P] Implement a script to compile `.proto` files into `internal/msg/game.pb.go`.
+- [x] T001 [P] Initialize Go module with `go mod init`.
+- [x] T002 [P] Add Zinx and Protobuf dependencies to `go.mod`.
+- [x] T003 [P] Create the project directory structure as defined in `plan.md`.
+- [x] T004 [P] Configure linting and formatting tools (`gofmt`, `golint`) and setup pre-commit hooks.
+- [x] T005 [P] Configure unit and E2E testing frameworks.
+- [x] T006 [P] Implement a script to compile `.proto` files into `internal/msg/game.pb.go`.
 
 ---
 
@@ -32,12 +32,12 @@
 
 **Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented.
 
-- [ ] T007 Implement the main server entry point in `main.go` to initialize and start the Zinx server.
-- [ ] T008 [P] Implement the global `RoomManager` singleton in `internal/server/room_manager.go` with methods for creating, finding, and deleting rooms.
-- [ ] T009 [P] Define the core `Player` struct in `internal/logic/player.go` to hold player state.
-- [ ] T010 [P] Define the `Card` and deck logic in `internal/logic/deck.go`, including shuffle functionality.
-- [ ] T011 Implement the basic `Room` struct in `internal/logic/room.go`, including player management (add/remove).
-- [ ] T012 Setup the basic Zinx message router in `internal/router/router.go` to link `MsgID`s to handlers.
+- [x] T007 Implement the main server entry point in `main.go` to initialize and start the Zinx server.
+- [x] T008 [P] Implement the global `RoomManager` singleton in `internal/server/room_manager.go` with methods for creating, finding, and deleting rooms.
+- [x] T009 [P] Define the core `Player` struct in `internal/logic/player.go` to hold player state.
+- [x] T010 [P] Define the `Card` and deck logic in `internal/logic/deck.go`, including shuffle functionality.
+- [x] T011 Implement the basic `Room` struct in `internal/logic/room.go`, including player management (add/remove).
+- [x] T012 Setup the basic Zinx message router in `internal/router/router.go` to link `MsgID`s to handlers.
 
 **Checkpoint**: Foundation ready - user story implementation can now begin.
 
