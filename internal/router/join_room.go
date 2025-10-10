@@ -3,9 +3,9 @@ package router
 import (
 	"github.com/aceld/zinx/ziface"
 	"github.com/aceld/zinx/znet"
-	"../logic"
-	"../server"
-	"../msg" // 假设这是生成的 protobuf 消息包
+	"xizexcample/internal/logic"
+	"xizexcample/internal/server"
+	"xizexcample/internal/msg" // 假设这是生成的 protobuf 消息包
 	"encoding/json"
 )
 
