@@ -31,31 +31,6 @@ type BaseRouter struct {
 	znet.BaseRouter
 }
 
-// JoinRoomHandler 加入房间处理器
-type JoinRoomHandler struct {
-	BaseRouter
-}
-
-// PlayerReadyHandler 玩家准备处理器
-type PlayerReadyHandler struct {
-	BaseRouter
-}
-
-// BidBankerHandler 抢庄处理器
-type BidBankerHandler struct {
-	BaseRouter
-}
-
-// PlaceBetHandler 下注处理器
-type PlaceBetHandler struct {
-	BaseRouter
-}
-
-// ShowdownHandler 摊牌处理器
-type ShowdownHandler struct {
-	BaseRouter
-}
-
 // LeaveRoomHandler 离开房间处理器
 type LeaveRoomHandler struct {
 	BaseRouter

@@ -3,9 +3,9 @@ package router
 import (
 	"github.com/aceld/zinx/ziface"
 	"github.com/aceld/zinx/znet"
-	"../logic"
-	"../server"
-	"../msg"
+	"xizexcample/internal/logic"
+	"xizexcample/internal/msg"
+	"xizexcample/internal/server"
 	"encoding/json"
 )
 

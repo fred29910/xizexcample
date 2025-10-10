@@ -39,12 +39,12 @@ func CalculateBull(cards []*Card) (CardType, uint32) {
 	for i := 0; i < 3; i++ {
 		for j := i + 1; j < 4; j++ {
 			for k := j + 1; k < 5; k++ {
-				if (cards[i].Value + cards[j].Value + cards[k].Value)%10 == 0 {
+				if (cards[i].Value() + cards[j].Value() + cards[k].Value())%10 == 0 {
 					// 有牛，计算剩余两张牌的点数
 					remainingSum := 0
 					for idx, card := range cards {
 						if idx != i && idx != j && idx != k {
-							remainingSum += card.Value
+							remainingSum += card.Value()
 						}
 					}
 					bullValue := remainingSum % 10
@@ -65,14 +65,14 @@ func checkSpecialCardTypes(cards []*Card) (CardType, bool) {
 	// 检查五小牛: 五张牌点数之和小于等于10
 	sum := 0
 	for _, card := range cards {
-		sum += card.Value
+		sum += card.Value()
 	}
 	if sum <= 10 {
 		return CARD_TYPE_FIVE_SMALL, true
 	}
 
 	// 检查炸弹: 四张牌点数相同
-	rankCount := make(map[int]int)
+	rankCount := make(map[Rank]int)
 	for _, card := range cards {
 		rankCount[card.Rank]++
 	}
@@ -162,9 +162,9 @@ func CompareHands(hand1, hand2 []*Card) int {
 	maxCard1 := getMaxCard(hand1)
 	maxCard2 := getMaxCard(hand2)
 
-	if maxCard1.Value > maxCard2.Value {
+	if maxCard1.Value() > maxCard2.Value() {
 		return 1
-	} else if maxCard1.Value < maxCard2.Value {
+	} else if maxCard1.Value() < maxCard2.Value() {
 		return -1
 	}
 
@@ -182,9 +182,9 @@ func CompareHands(hand1, hand2 []*Card) int {
 func getMaxCard(cards []*Card) *Card {
 	maxCard := cards[0]
 	for _, card := range cards {
-		if card.Value > maxCard.Value {
+		if card.Value() > maxCard.Value() {
 			maxCard = card
-		} else if card.Value == maxCard.Value && card.Suit > maxCard.Suit {
+		} else if card.Value() == maxCard.Value() && card.Suit > maxCard.Suit {
 			maxCard = card
 		}
 	}

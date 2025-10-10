@@ -1,12 +1,11 @@
 package router
 
 import (
-	"github.com/aceld/zinx/ziface"
-	"github.com/aceld/zinx/znet"
-	"xizexcample/internal/logic"
-	"xizexcample/internal/server"
-	"xizexcample/internal/msg" // 假设这是生成的 protobuf 消息包
 	"encoding/json"
+	"github.com/aceld/zinx/ziface"
+	"xizexcample/internal/logic"
+	"xizexcample/internal/msg"
+	"xizexcample/internal/server"
 )
 
 // JoinRoomHandler 处理加入房间请求
@@ -20,103 +19,85 @@ func (h *JoinRoomHandler) Handle(request ziface.IRequest) {
 	var joinReq msg.C2S_JoinRoomReq
 	err := json.Unmarshal(request.GetData(), &joinReq)
 	if err != nil {
-		h.sendErrorResponse(request.GetConnection(), "Invalid request data")
+		sendErrorResponse(request.GetConnection(), uint32(msg.S2C_JOIN_ROOM_ACK), "Invalid request data")
 		return
 	}
 
 	// 2. 获取或创建房间
 	roomManager := server.GetRoomManager()
-	room, err := roomManager.GetRoom(joinReq.RoomId)
+	room, err := roomManager.GetRoom(int32(joinReq.RoomId))
 	if err != nil {
 		// 房间不存在，尝试创建
-		room, err = roomManager.CreateRoom(joinReq.RoomId)
+		room, err = roomManager.CreateRoom(int32(joinReq.RoomId))
 		if err != nil {
-			h.sendErrorResponse(request.GetConnection(), "Failed to create room")
+			sendErrorResponse(request.GetConnection(), uint32(msg.S2C_JOIN_ROOM_ACK), "Failed to create room")
 			return
 		}
 	}
 
-	// 3. 创建玩家对象 (这里简化处理，实际应该从连接中获取或创建玩家)
-	// TODO: 需要将 Zinx 连接与 Player 对象关联起来
-	playerID := request.GetConnection().GetConnID() // 使用连接ID作为临时玩家ID
-	player := logic.NewPlayer(playerID, "Player"+string(playerID))
+	// 3. 检查是否是重连
+	playerID := request.GetConnection().GetConnID() // 在实际应用中，应该从请求中获取真实的玩家ID
+	existingPlayer, err := room.GetPlayer(int64(playerID))
+	if err == nil && !existingPlayer.IsOnline() {
+		// 是重连玩家
+		// T037: Re-associate connection with the existing Player object
+		existingPlayer.Conn = request.GetConnection()
+		existingPlayer.SetOnline(true)
+		existingPlayer.SetStatus(logic.STATUS_PLAYING) // Or whatever the status was
 
-	// 4. 将玩家加入房间
-	err = room.AddPlayer(player)
-	if err != nil {
-		h.sendErrorResponse(request.GetConnection(), err.Error())
+		// T038: Send a full room state sync message to the reconnected player
+		sendFullRoomState(existingPlayer)
+
+		// Broadcast to other players that this player has reconnected
+		broadcastRoomState(room)
 		return
 	}
 
-	// 5. 准备并发送成功响应
+	// 4. 创建新玩家对象
+	player := logic.NewPlayer(int64(playerID), "Player"+string(playerID), request.GetConnection())
+
+	// 5. 将玩家加入房间
+	err = room.AddPlayer(player)
+	if err != nil {
+		sendErrorResponse(request.GetConnection(), uint32(msg.S2C_JOIN_ROOM_ACK), err.Error())
+		return
+	}
+
+	// 将 playerID 设置到连接属性中
+	request.GetConnection().SetProperty("playerID", player.ID)
+	roomManager.RegisterPlayer(player.ID, room.ID)
+
+	// 6. 准备并发送成功响应
 	joinAck := &msg.S2C_JoinRoomAck{
 		RetCode: 0,
 		RoomInfo: &msg.RoomInfo{
-			RoomId: uint32(room.ID),
-			Players: []*msg.PlayerInfo{},
-			GameState: msg.GAME_STATE_WAITING_FOR_PLAYERS,
-			BankerId: 0,
+			RoomId:    uint32(room.ID),
+			Players:   []*msg.PlayerInfo{},
+			GameState: msg.GameState(room.GetFSM().GetCurrentState()),
+			BankerId:  int64(room.GetBankerID()),
 		},
 	}
 
-	// 将 RoomInfo 中的 Players 填充
 	for _, p := range room.GetPlayers() {
 		playerInfo := &msg.PlayerInfo{
 			PlayerId: uint64(p.ID),
 			Nickname: p.Nickname,
 			Score:    uint64(p.Score),
-			Status:   msg.PLAYER_STATUS_WAITING,
-			IsBanker: false,
+			Status:   msg.PlayerStatus(p.GetStatus()),
+			IsBanker: p.IsBanker(),
 		}
 		joinAck.RoomInfo.Players = append(joinAck.RoomInfo.Players, playerInfo)
 	}
 
 	ackData, err := json.Marshal(joinAck)
 	if err != nil {
-		h.sendErrorResponse(request.GetConnection(), "Failed to marshal response")
+		sendErrorResponse(request.GetConnection(), uint32(msg.S2C_JOIN_ROOM_ACK), "Failed to marshal response")
 		return
 	}
 
 	request.GetConnection().SendMsg(uint32(msg.S2C_JOIN_ROOM_ACK), ackData)
 
-	// 6. 广播房间状态更新给所有玩家
+	// 7. 广播房间状态更新给所有玩家
 	broadcastRoomState(room)
 }
 
-// sendErrorResponse 发送错误响应
-func (h *JoinRoomHandler) sendErrorResponse(conn ziface.IConnection, errorMsg string) {
-	// TODO: 定义一个标准的错误消息结构
-	errAck := map[string]interface{}{
-		"ret_code": 1,
-		"message":  errorMsg,
-	}
-	ackData, _ := json.Marshal(errAck)
-	conn.SendMsg(uint32(msg.S2C_JOIN_ROOM_ACK), ackData)
-}
-
-// broadcastRoomState 广播房间状态给所有玩家
-func broadcastRoomState(room *logic.Room) {
-	// TODO: 实现广播逻辑，需要遍历房间内所有玩家的连接并发送消息
-	// 这部分逻辑需要将 Player 对象与 Zinx Connection 对象关联起来
-	// 目前只是一个占位符
-	roomInfo := &msg.RoomInfo{
-		RoomId: uint32(room.ID),
-		Players: []*msg.PlayerInfo{},
-		GameState: msg.GAME_STATE_WAITING_FOR_PLAYERS,
-		BankerId: 0,
-	}
-
-	for _, p := range room.GetPlayers() {
-		playerInfo := &msg.PlayerInfo{
-			PlayerId: uint64(p.ID),
-			Nickname: p.Nickname,
-			Score:    uint64(p.Score),
-			Status:   msg.PLAYER_STATUS_WAITING,
-			IsBanker: false,
-		}
-		roomInfo.Players = append(roomInfo.Players, playerInfo)
-	}
-
-	ackData, _ := json.Marshal(roomInfo)
-	// TODO: conn.SendMsg(uint32(msg.S2C_SYNC_ROOM_STATE_NTF), ackData)
-}

@@ -2,6 +2,7 @@ package logic
 
 import (
 	"sync"
+	"github.com/aceld/zinx/ziface"
 )
 
 // Player 表示一个玩家
@@ -15,17 +16,18 @@ type Player struct {
 	Hand      []Card
 	BetAmount int32
 	Status    PlayerStatus
-	IsBanker  bool
+	isBanker  bool
 
 	// 连接相关
-	// TODO: 将在后续任务中添加 Zinx 连接对象
-	// conn znet.Connection
+	IsOnline       bool
+	Conn           ziface.IConnection
+	DisconnectTime int64 // Unix timestamp
 
 	mu sync.RWMutex
 }
 
 // NewPlayer 创建一个新玩家
-func NewPlayer(id int64, nickname string) *Player {
+func NewPlayer(id int64, nickname string, conn ziface.IConnection) *Player {
 	return &Player{
 		ID:       id,
 		Nickname: nickname,
@@ -33,6 +35,8 @@ func NewPlayer(id int64, nickname string) *Player {
 		RoomID:   0,
 		Hand:     make([]Card, 0),
 		Status:   STATUS_WAITING,
+		IsOnline: true,
+		Conn:     conn,
 	}
 }
 
@@ -46,6 +50,19 @@ func (p *Player) SetStatus(status PlayerStatus) {
 // GetStatus 获取玩家状态
 func (p *Player) GetStatus() PlayerStatus {
 	p.mu.RLock()
+// SetOnline 设置玩家在线状态
+func (p *Player) SetOnline(online bool) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.IsOnline = online
+}
+
+// IsOnline 检查玩家是否在线
+func (p *Player) IsOnline() bool {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return p.IsOnline
+}
 	defer p.mu.RUnlock()
 	return p.Status
 }
@@ -82,14 +99,14 @@ func (p *Player) GetRoomID() int32 {
 func (p *Player) SetBanker(isBanker bool) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	p.IsBanker = isBanker
+	p.isBanker = isBanker
 }
 
 // IsBanker 检查玩家是否是庄家
 func (p *Player) IsBanker() bool {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	return p.IsBanker
+	return p.isBanker
 }
 
 // PlaceBet 下注
@@ -120,43 +137,6 @@ func (p *Player) ResetBet() {
 	p.BetAmount = 0
 }
 
-// Card 表示一张扑克牌
-type Card struct {
-	Suit Suit
-	Rank Rank
-}
-
-// Suit 花色
-type Suit int
-
-const (
-	SUIT_UNKNOWN Suit = iota
-	SUIT_SPADES
-	SUIT_HEARTS
-	SUIT_CLUBS
-	SUIT_DIAMONDS
-)
-
-// Rank 点数
-type Rank int
-
-const (
-	RANK_UNKNOWN Rank = iota
-	RANK_ACE
-	RANK_TWO
-	RANK_THREE
-	RANK_FOUR
-	RANK_FIVE
-	RANK_SIX
-	RANK_SEVEN
-	RANK_EIGHT
-	RANK_NINE
-	RANK_TEN
-	RANK_JACK
-	RANK_QUEEN
-	RANK_KING
-)
-
 // PlayerStatus 玩家状态
 type PlayerStatus int
 
@@ -165,4 +145,5 @@ const (
 	STATUS_WAITING
 	STATUS_READY
 	STATUS_PLAYING
+	STATUS_OFFLINE
 )

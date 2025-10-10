@@ -2,7 +2,10 @@ module xizexcample
 
 go 1.25.1
 
-require github.com/aceld/zinx v1.2.7
+require (
+	github.com/aceld/zinx v1.2.7
+	google.golang.org/protobuf v1.33.0
+)
 
 require (
 	github.com/gorilla/websocket v1.5.0 // indirect

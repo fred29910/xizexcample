@@ -1,3 +1,3 @@
 #!/bin/bash
-protoc --go_out=. --go_opt=paths=source_relative \
+protoc --go_out=. --go_opt=module=xizexcample \
     api/proto/game.proto

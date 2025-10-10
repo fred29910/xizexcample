@@ -3,6 +3,7 @@ package logic
 import (
 	"errors"
 	"sync"
+	"time"
 )
 
 // Room 表示一个游戏房间
@@ -15,11 +16,13 @@ type Room struct {
 
 // NewRoom 创建一个新房间
 func NewRoom(roomID int32) *Room {
-	return &Room{
+	r := &Room{
 		ID:      roomID,
 		Players: make(map[int64]*Player),
 		Deck:    NewDeck(),
 	}
+	go r.startCleanupTimer()
+	return r
 }
 
 // AddPlayer 添加一个玩家到房间
@@ -53,6 +56,21 @@ func (r *Room) RemovePlayer(playerID int64) error {
 	player.SetRoomID(0) // 从房间中移除
 	delete(r.Players, playerID)
 	return nil
+}
+// SetPlayerOffline 将玩家标记为离线
+func (r *Room) SetPlayerOffline(playerID int64) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	player, exists := r.Players[playerID]
+	if !exists {
+		return
+	}
+
+	player.SetOnline(false)
+	player.SetStatus(STATUS_OFFLINE)
+	player.DisconnectTime = time.Now().Unix()
+	// TODO: 在此广播玩家断线通知
 }
 
 // GetPlayer 获取房间内的一个玩家
@@ -154,4 +172,31 @@ func (r *Room) HasBanker() bool {
 		}
 	}
 	return false
+}
+
+// startCleanupTimer 启动一个定时器，定期清理断线的玩家
+func (r *Room) startCleanupTimer() {
+	ticker := time.NewTicker(1 * time.Minute) // 每分钟检查一次
+	defer ticker.Stop()
+
+	for range ticker.C {
+		r.cleanupDisconnectedPlayers()
+	}
+}
+
+// cleanupDisconnectedPlayers 清理长时间未重连的玩家
+func (r *Room) cleanupDisconnectedPlayers() {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	now := time.Now().Unix()
+	timeout := int64(5 * 60) // 5分钟超时
+
+	for playerID, player := range r.Players {
+		if !player.IsOnline() && (now-player.DisconnectTime) > timeout {
+			// 超时，移除玩家
+			delete(r.Players, playerID)
+			// TODO: 广播玩家被移除的通知
+		}
+	}
 }

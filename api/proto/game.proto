@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package game;
 
-option go_package = "./msg";
+option go_package = "xizexcample/internal/msg";
 
 // 消息ID枚举
 enum MsgID {

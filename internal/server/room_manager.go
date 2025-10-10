@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"sync"
+	"xizexcample/internal/logic"
 )
 
 // RoomManager 是一个全局单例，用于管理所有房间
@@ -13,22 +14,24 @@ var (
 
 // RoomManager 房间管理器
 type RoomManager struct {
-	rooms map[int32]*Room // key: roomID
-	mu    sync.RWMutex
+	rooms      map[int32]*logic.Room // key: roomID
+	playerRoom map[int64]int32     // key: playerID, value: roomID
+	mu         sync.RWMutex
 }
 
 // GetRoomManager 获取 RoomManager 单例
 func GetRoomManager() *RoomManager {
 	once.Do(func() {
 		roomManagerInstance = &RoomManager{
-			rooms: make(map[int32]*Room),
+			rooms:      make(map[int32]*logic.Room),
+			playerRoom: make(map[int64]int32),
 		}
 	})
 	return roomManagerInstance
 }
 
 // CreateRoom 创建一个新房间
-func (rm *RoomManager) CreateRoom(roomID int32) (*Room, error) {
+func (rm *RoomManager) CreateRoom(roomID int32) (*logic.Room, error) {
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
 
@@ -36,13 +39,13 @@ func (rm *RoomManager) CreateRoom(roomID int32) (*Room, error) {
 		return nil, errors.New("room already exists")
 	}
 
-	room := NewRoom(roomID)
+	room := logic.NewRoom(roomID)
 	rm.rooms[roomID] = room
 	return room, nil
 }
 
 // GetRoom 根据房间ID获取房间
-func (rm *RoomManager) GetRoom(roomID int32) (*Room, error) {
+func (rm *RoomManager) GetRoom(roomID int32) (*logic.Room, error) {
 	rm.mu.RLock()
 	defer rm.mu.RUnlock()
 
@@ -66,22 +69,34 @@ func (rm *RoomManager) DeleteRoom(roomID int32) error {
 	return nil
 }
 
-// Room 房间结构体 (简化版，将在后续任务中完善)
-type Room struct {
-	ID      int32
-	Players map[int64]*Player // key: playerID
-}
+// GetRoomByPlayerID 根据玩家ID获取房间
+func (rm *RoomManager) GetRoomByPlayerID(playerID int64) *logic.Room {
+	rm.mu.RLock()
+	defer rm.mu.RUnlock()
 
-// NewRoom 创建一个新房间实例
-func NewRoom(roomID int32) *Room {
-	return &Room{
-		ID:      roomID,
-		Players: make(map[int64]*Player),
+	roomID, ok := rm.playerRoom[playerID]
+	if !ok {
+		return nil
 	}
+
+	room, ok := rm.rooms[roomID]
+	if !ok {
+		// Data inconsistency, should not happen
+		return nil
+	}
+	return room
 }
 
-// Player 玩家结构体 (简化版，将在后续任务中完善)
-type Player struct {
-	ID   int64
-	Name string
+// RegisterPlayer 将玩家注册到房间
+func (rm *RoomManager) RegisterPlayer(playerID int64, roomID int32) {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+	rm.playerRoom[playerID] = roomID
+}
+
+// UnregisterPlayer 从房间注销玩家
+func (rm *RoomManager) UnregisterPlayer(playerID int64) {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+	delete(rm.playerRoom, playerID)
 }

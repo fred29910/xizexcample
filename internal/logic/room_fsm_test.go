@@ -14,10 +14,16 @@ func TestRoomFSMBidBanker(t *testing.T) {
 		t.Error("Expected error when bidding banker from invalid state, but got nil")
 	}
 
-	// 测试从抢庄状态抢庄
-	err = fsm.TransitionTo(STATE_BIDDING)
+	// 模拟完整的状态流
+	room.AddPlayer(NewPlayer(1, "p1"))
+	room.AddPlayer(NewPlayer(2, "p2"))
+	err = fsm.StartGame()
 	if err != nil {
-		t.Fatalf("Failed to transition to BIDDING state: %v", err)
+		t.Fatalf("StartGame failed: %v", err)
+	}
+	err = fsm.DealCards()
+	if err != nil {
+		t.Fatalf("DealCards failed: %v", err)
 	}
 
 	err = fsm.BidBanker()
@@ -41,11 +47,12 @@ func TestRoomFSMPlaceBet(t *testing.T) {
 		t.Error("Expected error when placing bet from invalid state, but got nil")
 	}
 
-	// 测试从下注状态下注
-	err = fsm.TransitionTo(STATE_BETTING)
-	if err != nil {
-		t.Fatalf("Failed to transition to BETTING state: %v", err)
-	}
+	// 模拟完整的状态流
+	room.AddPlayer(NewPlayer(1, "p1"))
+	room.AddPlayer(NewPlayer(2, "p2"))
+	fsm.StartGame()
+	fsm.DealCards()
+	fsm.BidBanker()
 
 	err = fsm.PlaceBet()
 	if err != nil {
@@ -68,11 +75,13 @@ func TestRoomFSMShowdown(t *testing.T) {
 		t.Error("Expected error when showdown from invalid state, but got nil")
 	}
 
-	// 测试从摊牌状态摊牌
-	err = fsm.TransitionTo(STATE_SHOWDOWN)
-	if err != nil {
-		t.Fatalf("Failed to transition to SHOWDOWN state: %v", err)
-	}
+	// 模拟完整的状态流
+	room.AddPlayer(NewPlayer(1, "p1"))
+	room.AddPlayer(NewPlayer(2, "p2"))
+	fsm.StartGame()
+	fsm.DealCards()
+	fsm.BidBanker()
+	fsm.PlaceBet()
 
 	err = fsm.Showdown()
 	if err != nil {
@@ -95,11 +104,14 @@ func TestRoomFSMSettlement(t *testing.T) {
 		t.Error("Expected error when settlement from invalid state, but got nil")
 	}
 
-	// 测试从结算状态结算
-	err = fsm.TransitionTo(STATE_SETTLEMENT)
-	if err != nil {
-		t.Fatalf("Failed to transition to SETTLEMENT state: %v", err)
-	}
+	// 模拟完整的状态流
+	room.AddPlayer(NewPlayer(1, "p1"))
+	room.AddPlayer(NewPlayer(2, "p2"))
+	fsm.StartGame()
+	fsm.DealCards()
+	fsm.BidBanker()
+	fsm.PlaceBet()
+	fsm.Showdown()
 
 	err = fsm.Settlement()
 	if err != nil {

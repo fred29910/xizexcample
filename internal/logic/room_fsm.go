@@ -2,6 +2,7 @@ package logic
 
 import (
 	"errors"
+	"fmt"
 )
 
 // GameState 游戏状态
@@ -58,7 +59,7 @@ func (fsm *RoomFSM) TransitionTo(newState GameState) error {
 		}
 	}
 
-	return errors.New("invalid state transition from %d to %d", fsm.currentState, newState)
+	return fmt.Errorf("invalid state transition from %d to %d", fsm.currentState, newState)
 }
 
 // CanStartGame 检查是否可以开始游戏

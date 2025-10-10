@@ -1,9 +1,109 @@
 package logic
 
 import (
+	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 )
+
+// Card 表示一张扑克牌
+type Card struct {
+	Suit Suit
+	Rank Rank
+}
+
+// Value 返回牌的点数，用于计算
+func (c *Card) Value() int {
+	if c.Rank >= RANK_TEN && c.Rank <= RANK_KING {
+		return 10
+	}
+	return int(c.Rank)
+}
+
+// String 返回牌的字符串表示
+func (c *Card) String() string {
+	return fmt.Sprintf("%s of %s", c.Rank.String(), c.Suit.String())
+}
+
+// Suit 花色
+type Suit int
+
+const (
+	SUIT_UNKNOWN Suit = iota
+	SUIT_SPADES
+	SUIT_HEARTS
+	SUIT_CLUBS
+	SUIT_DIAMONDS
+)
+
+func (s Suit) String() string {
+	switch s {
+	case SUIT_SPADES:
+		return "Spades"
+	case SUIT_HEARTS:
+		return "Hearts"
+	case SUIT_CLUBS:
+		return "Clubs"
+	case SUIT_DIAMONDS:
+		return "Diamonds"
+	default:
+		return "Unknown"
+	}
+}
+
+// Rank 点数
+type Rank int
+
+const (
+	RANK_UNKNOWN Rank = iota
+	RANK_ACE
+	RANK_TWO
+	RANK_THREE
+	RANK_FOUR
+	RANK_FIVE
+	RANK_SIX
+	RANK_SEVEN
+	RANK_EIGHT
+	RANK_NINE
+	RANK_TEN
+	RANK_JACK
+	RANK_QUEEN
+	RANK_KING
+)
+
+func (r Rank) String() string {
+	switch r {
+	case RANK_ACE:
+		return "Ace"
+	case RANK_TWO:
+		return "Two"
+	case RANK_THREE:
+		return "Three"
+	case RANK_FOUR:
+		return "Four"
+	case RANK_FIVE:
+		return "Five"
+	case RANK_SIX:
+		return "Six"
+	case RANK_SEVEN:
+		return "Seven"
+	case RANK_EIGHT:
+		return "Eight"
+	case RANK_NINE:
+		return "Nine"
+	case RANK_TEN:
+		return "Ten"
+	case RANK_JACK:
+		return "Jack"
+	case RANK_QUEEN:
+		return "Queen"
+	case RANK_KING:
+		return "King"
+	default:
+		return "Unknown"
+	}
+}
 
 // Deck 表示一副扑克牌
 type Deck struct {
@@ -31,8 +131,8 @@ func (d *Deck) Reset() {
 
 // Shuffle 洗牌
 func (d *Deck) Shuffle() {
-	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(len(d.cards), func(i, j int) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	r.Shuffle(len(d.cards), func(i, j int) {
 		d.cards[i], d.cards[j] = d.cards[j], d.cards[i]
 	})
 }
