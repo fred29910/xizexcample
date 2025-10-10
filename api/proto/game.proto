@@ -1,0 +1,187 @@
+syntax = "proto3";
+
+package game;
+
+option go_package = "./msg";
+
+// 消息ID枚举
+enum MsgID {
+  UNKNOWN = 0;
+  // Client to Server
+  C2S_JOIN_ROOM_REQ = 101;
+  C2S_PLAYER_READY_REQ = 102;
+  C2S_BID_BANKER_REQ = 103;
+  C2S_PLACE_BET_REQ = 104;
+  C2S_SHOWDOWN_REQ = 105;
+  C2S_LEAVE_ROOM_REQ = 106;
+
+  // Server to Client
+  S2C_JOIN_ROOM_ACK = 201;
+  S2C_SYNC_ROOM_STATE_NTF = 202;
+  S2C_GAME_START_NTF = 203;
+  S2C_DEAL_CARDS_NTF = 204;
+  S2C_BID_BANKER_NTF = 205;
+  S2C_BET_NTF = 206;
+  S2C_SHOWDOWN_NTF = 207;
+  S2C_GAME_RESULT_NTF = 208;
+  S2C_PLAYER_LEAVE_NTF = 209;
+}
+
+// 卡牌花色
+enum Suit {
+  SUIT_UNKNOWN = 0;
+  SPADES = 1;   // 黑桃
+  HEARTS = 2;   // 红心
+  CLUBS = 3;    // 梅花
+  DIAMONDS = 4; // 方块
+}
+
+// 卡牌点数
+enum Rank {
+  RANK_UNKNOWN = 0;
+  ACE = 1;
+  TWO = 2;
+  THREE = 3;
+  FOUR = 4;
+  FIVE = 5;
+  SIX = 6;
+  SEVEN = 7;
+  EIGHT = 8;
+  NINE = 9;
+  TEN = 10;
+  JACK = 11;
+  QUEEN = 12;
+  KING = 13;
+}
+
+// 牌型
+enum CardPattern {
+  PATTERN_UNKNOWN = 0;
+  NO_NIU = 1;
+  NIU_1 = 2;
+  NIU_2 = 3;
+  NIU_3 = 4;
+  NIU_4 = 5;
+  NIU_5 = 6;
+  NIU_6 = 7;
+  NIU_7 = 8;
+  NIU_8 = 9;
+  NIU_9 = 10;
+  NIU_NIU = 11;
+  FIVE_FLOWER_NIU = 12; // 五花牛
+  BOMB_NIU = 13;        // 炸弹牛
+  FIVE_SMALL_NIU = 14;  // 五小牛
+}
+
+// 玩家状态
+enum PlayerStatus {
+  STATUS_UNKNOWN = 0;
+  WAITING = 1;
+  READY = 2;
+  PLAYING = 3;
+}
+
+// 游戏阶段
+enum GameState {
+  STATE_UNKNOWN = 0;
+  WAITING_FOR_PLAYERS = 1;
+  DEALING = 2;
+  BIDDING = 3;
+  BETTING = 4;
+  SHOWDOWN = 5;
+  SETTLEMENT = 6;
+}
+
+// 数据结构
+message Card {
+  Suit suit = 1;
+  Rank rank = 2;
+}
+
+message PlayerInfo {
+  int64 player_id = 1;
+  string nickname = 2;
+  int64 score = 3;
+  PlayerStatus status = 4;
+  bool is_banker = 5;
+  repeated Card hand = 6;
+  CardPattern card_pattern = 7;
+}
+
+// C2S 消息
+message C2S_JoinRoomReq {
+  int32 room_id = 1;
+}
+
+message C2S_PlayerReadyReq {
+  bool is_ready = 1;
+}
+
+message C2S_BidBankerReq {
+  int32 multiple = 1; // 抢庄倍数, 0表示不抢
+}
+
+message C2S_PlaceBetReq {
+  int32 multiple = 1; // 下注倍数
+}
+
+message C2S_ShowdownReq {
+  // 客户端计算好牌型后，将手牌顺序调整好再发给服务器
+  repeated Card sorted_hand = 1;
+}
+
+message C2S_LeaveRoomReq {}
+
+// S2C 消息
+message S2C_JoinRoomAck {
+  int32 ret_code = 1; // 0 for success
+  RoomInfo room_info = 2;
+}
+
+message RoomInfo {
+  int32 room_id = 1;
+  repeated PlayerInfo players = 2;
+  GameState game_state = 3;
+  int64 banker_id = 4;
+}
+
+message S2C_SyncRoomStateNtf {
+  RoomInfo room_info = 1;
+}
+
+message S2C_GameStartNtf {
+  int64 banker_id = 1;
+}
+
+message S2C_DealCardsNtf {
+  repeated Card hand = 1;
+}
+
+message S2C_BidBankerNtf {
+  int32 countdown = 1; // 倒计时
+}
+
+message S2C_BetNtf {
+  int64 banker_id = 1;
+  int32 countdown = 2; // 倒计时
+}
+
+message S2C_ShowdownNtf {
+  int32 countdown = 1; // 倒计时
+}
+
+message PlayerResult {
+  int64 player_id = 1;
+  repeated Card hand = 2;
+  CardPattern card_pattern = 3;
+  int64 score_change = 4;
+  int64 final_score = 5;
+}
+
+message S2C_GameResultNtf {
+  repeated PlayerResult results = 1;
+}
+
+message S2C_PlayerLeaveNtf {
+  int64 player_id = 1;
+}

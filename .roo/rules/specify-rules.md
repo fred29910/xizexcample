@@ -1,20 +1,21 @@
-# [PROJECT NAME] Development Guidelines
+# xizexcample Development Guidelines
 
-Auto-generated from all feature plans. Last updated: [DATE]
+Auto-generated from all feature plans. Last updated: 2025-10-10
 
 ## Active Technologies
-[EXTRACTED FROM ALL PLAN.MD FILES]
+- Go (latest stable version) + Zinx, Protobuf (001-)
 
 ## Project Structure
 ```
-[ACTUAL STRUCTURE FROM PLANS]
+src/
+tests/
 ```
 
 ## Commands
-[ONLY COMMANDS FOR ACTIVE TECHNOLOGIES]
+# Add commands for Go (latest stable version)
 
 ## Code Style
-[LANGUAGE-SPECIFIC, ONLY FOR LANGUAGES IN USE]
+Go (latest stable version): Follow standard conventions
 
 **Note**: All code MUST adhere to the principles outlined in the project constitution at `.specify/memory/constitution.md`. This includes:
 - Strict formatting with `gofmt`
@@ -22,7 +23,7 @@ Auto-generated from all feature plans. Last updated: [DATE]
 - Mandatory pre-commit `lint` checks
 
 ## Recent Changes
-[LAST 3 FEATURES AND WHAT THEY ADDED]
+- 001-: Added Go (latest stable version) + Zinx, Protobuf
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

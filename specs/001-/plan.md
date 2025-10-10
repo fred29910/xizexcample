@@ -7,25 +7,19 @@
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+使用 Go 语言和 Zinx 框架构建一个功能完善、性能稳定的“斗牛牛”棋牌游戏服务器。服务器将管理完整的游戏生命周期，处理实时通信，并在内存中维护所有游戏状态。
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., go test, testify or NEEDS CLARIFICATION]
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Go (latest stable version)
+**Primary Dependencies**: Zinx, Protobuf
+**Storage**: N/A (All game state is in-memory)
+**Testing**: Go standard library testing, testify
+**Target Platform**: Linux server
+**Project Type**: Single project (game server)
+**Performance Goals**: Support 100 concurrent rooms (500 users) with <200ms latency
+**Constraints**: TCP long connections, custom binary protocol (MsgID + Protobuf)
+**Scale/Scope**: Initial version supports the full "斗牛牛" game loop for up to 5 players per room.
 
 ## Constitution Check
 
@@ -59,43 +53,24 @@ specs/[###-feature]/
 -->
 
 ```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+# Single project (game server)
+.
+├── api/              # Protobuf definition files (.proto)
+│   └── proto/
+│       └── game.proto
+├── internal/         # Internal application code
+│   ├── conf/         # Configuration
+│   ├── logic/        # Core business logic (Room, Player, Game State Machine)
+│   ├── msg/          # Protobuf generated code
+│   ├── router/       # Zinx message routers
+│   └── server/       # Server setup and management (RoomManager)
+├── main.go           # Application entry point
+└── tests/            # Test files
+    ├── e2e/
+    └── unit/
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: A single Go project structure is chosen. The `internal` directory houses all core application logic, preventing it from being imported by other projects. The `api` directory contains the Protobuf definitions, which act as the contract between the server and client. `main.go` initializes and starts the server.
 
 ## Complexity Tracking
 

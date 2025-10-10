@@ -32,6 +32,13 @@
 - [ ] CHK005 Item with specific criteria
 - [ ] CHK006 Final item in this category
 
+## Constitution Compliance (Sample)
+
+- [ ] CHK007 Code has been formatted with `gofmt`
+- [ ] CHK008 Code passes all `golint` checks
+- [ ] CHK009 All new functionality is covered by unit tests
+- [ ] CHK010 E2E tests have been created for the user-facing feature
+
 ## Notes
 
 - Check items off as completed: `[x]`
