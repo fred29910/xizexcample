@@ -78,6 +78,48 @@ func (p *Player) GetRoomID() int32 {
 	return p.RoomID
 }
 
+// SetBanker 设置玩家为庄家
+func (p *Player) SetBanker(isBanker bool) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.IsBanker = isBanker
+}
+
+// IsBanker 检查玩家是否是庄家
+func (p *Player) IsBanker() bool {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return p.IsBanker
+}
+
+// PlaceBet 下注
+func (p *Player) PlaceBet(amount int32) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.BetAmount = amount
+}
+
+// GetBetAmount 获取下注金额
+func (p *Player) GetBetAmount() int32 {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return p.BetAmount
+}
+
+// HasBet 检查玩家是否已下注
+func (p *Player) HasBet() bool {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return p.BetAmount > 0
+}
+
+// ResetBet 重置下注
+func (p *Player) ResetBet() {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.BetAmount = 0
+}
+
 // Card 表示一张扑克牌
 type Card struct {
 	Suit Suit

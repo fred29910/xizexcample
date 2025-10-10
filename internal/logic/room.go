@@ -122,3 +122,36 @@ func (r *Room) DealCardsToPlayer(playerID int64, num int) error {
 	}
 	return nil
 }
+
+// SetBanker 设置庄家
+func (r *Room) SetBanker(playerID int64) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	// TODO: 可以在这里添加更复杂的庄家选择逻辑
+	// 例如，比较所有玩家的抢庄倍数
+	r.Players[playerID].SetBanker(true)
+}
+
+// GetBankerID 获取庄家ID
+func (r *Room) GetBankerID() int64 {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	for _, player := range r.Players {
+		if player.IsBanker() {
+			return player.ID
+		}
+	}
+	return 0
+}
+
+// HasBanker 检查是否有庄家
+func (r *Room) HasBanker() bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	for _, player := range r.Players {
+		if player.IsBanker() {
+			return true
+		}
+	}
+	return false
+}

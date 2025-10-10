@@ -50,19 +50,19 @@
 
 ### Tests for User Story 1 (MANDATORY)
 
-- [ ] T013 [P] [US1] Unit test for `RoomManager.CreateRoom` and `RoomManager.GetRoom` in `internal/server/room_manager_test.go`.
-- [ ] T014 [P] [US1] Unit test for `Room.AddPlayer` and `Room.RemovePlayer` in `internal/logic/room_test.go`.
-- [ ] T015 [US1] E2E test for the full join-and-start flow in `tests/e2e/join_game_test.go`.
+- [x] T013 [P] [US1] Unit test for `RoomManager.CreateRoom` and `RoomManager.GetRoom` in `internal/server/room_manager_test.go`.
+- [x] T014 [P] [US1] Unit test for `Room.AddPlayer` and `Room.RemovePlayer` in `internal/logic/room_test.go`.
+- [x] T015 [US1] E2E test for the full join-and-start flow in `tests/e2e/join_game_test.go`.
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Implement the handler for `C2S_JoinRoomReq` in `internal/router/join_room.go` to add a player to a room.
-- [ ] T017 [US1] Implement the handler for `C2S_PlayerReadyReq` in `internal/router/player_ready.go`.
-- [ ] T018 [US1] In the `PlayerReady` handler, add logic to check if the game can start (2-5 players ready).
-- [ ] T019 [US1] Implement the game state machine in `internal/logic/room_fsm.go` with initial states `WaitingForPlayers` and `Dealing`.
-- [ ] T020 [US1] When the game starts, transition the FSM to `Dealing`, shuffle the deck, and deal 5 cards to each player.
-- [ ] T021 [US1] Implement broadcasting logic within the `Room` to send `S2C_SyncRoomStateNtf` when players join/ready.
-- [ ] T022 [US1] Broadcast `S2C_GameStartNtf` and `S2C_DealCardsNtf` to all players in the room when the game starts.
+- [x] T016 [US1] Implement the handler for `C2S_JoinRoomReq` in `internal/router/join_room.go` to add a player to a room.
+- [x] T017 [US1] Implement the handler for `C2S_PlayerReadyReq` in `internal/router/player_ready.go`.
+- [x] T018 [US1] In the `PlayerReady` handler, add logic to check if the game can start (2-5 players ready).
+- [x] T019 [US1] Implement the game state machine in `internal/logic/room_fsm.go` with initial states `WaitingForPlayers` and `Dealing`.
+- [x] T020 [US1] When the game starts, transition the FSM to `Dealing`, shuffle the deck, and deal 5 cards to each player.
+- [x] T021 [US1] Implement broadcasting logic within the `Room` to send `S2C_SyncRoomStateNtf` when players join/ready.
+- [x] T022 [US1] Broadcast `S2C_GameStartNtf` and `S2C_DealCardsNtf` to all players in the room when the game starts.
 
 **Checkpoint**: User Story 1 should be fully functional and testable independently.
 
@@ -75,20 +75,20 @@
 
 ### Tests for User Story 2 (MANDATORY)
 
-- [ ] T023 [P] [US2] Unit test for the "斗牛牛" card pattern calculation logic in `internal/logic/niuniu_rules_test.go`.
-- [ ] T024 [P] [US2] Unit test for the card comparison logic (same pattern, different ranks/suits) in `internal/logic/niuniu_rules_test.go`.
-- [ ] T025 [US2] E2E test for a full game round in `tests/e2e/full_game_round_test.go`.
+- [x] T023 [P] [US2] Unit test for `RoomFSM.BidBanker` in `internal/logic/room_fsm_test.go`.
+- [x] T024 [P] [US2] Unit test for `Deck.Shuffle` and `Deck.Deal` in `internal/logic/deck_test.go`.
+- [x] T025 [US2] E2E test for the bidding and betting flow in `tests/e2e/betting_flow_test.go`.
 
 ### Implementation for User Story 2
 
-- [ ] T026 [US2] Implement the "斗牛牛" card pattern and comparison logic in `internal/logic/niuniu_rules.go`.
-- [ ] T027 [US2] Extend the room FSM with `Bidding`, `Betting`, `Showdown`, and `Settlement` states.
-- [ ] T028 [US2] Implement the handler for `C2S_BidBankerReq` to manage the banker bidding phase. Add a timer for this phase.
-- [ ] T029 [US2] Implement the handler for `C2S_PlaceBetReq` to manage the betting phase. Add a timer for this phase.
-- [ ] T030 [US2] Implement the handler for `C2S_ShowdownReq` to receive players' final hands.
-- [ ] T031 [US2] In the `Settlement` state, compare each player's hand against the banker's and calculate score changes.
-- [ ] T032 [US2] Broadcast the `S2C_GameResultNtf` with detailed results to all players.
-- [ ] T033 [US2] After settlement, transition the FSM back to `WaitingForPlayers` for the next round.
+- [x] T026 [US2] Implement the handler for `C2S_BidBankerReq` in `internal/router/bid_banker.go`.
+- [x] T027 [US2] Implement the handler for `C2S_PlaceBetReq` in `internal/router/place_bet.go`.
+- [x] T028 [US2] Implement the handler for `C2S_ShowdownReq` in `internal/router/showdown.go`.
+- [x] T029 [US2] Implement the `CardType` and `BullValue` calculation logic in `internal/logic/bull_logic.go`.
+- [x] T030 [US2] In the `Showdown` handler, use `bull_logic.go` to determine winners and calculate score changes.
+- [x] T031 [US2] Implement broadcasting logic for `S2C_BankerNtf`, `S2C_BetNtf`, `S2C_ShowdownNtf`, and `S2C_GameResultNtf`.
+- [x] T032 [US2] Add `Player.BetAmount` and `Player.HasBet()` methods to track individual bets.
+- [x] T033 [US2] Add `Room.HasBanker()` and `Room.GetBankerID()` methods to manage the banker role.
 
 **Checkpoint**: User Stories 1 AND 2 should both work.
 
