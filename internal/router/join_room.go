@@ -2,9 +2,11 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/aceld/zinx/ziface"
 	"xizexcample/internal/logic"
 	"xizexcample/internal/msg"
+	"xizexcample/internal/pkg/logger"
 	"xizexcample/internal/server"
 )
 
@@ -19,9 +21,11 @@ func (h *JoinRoomHandler) Handle(request ziface.IRequest) {
 	var joinReq msg.C2S_JoinRoomReq
 	err := json.Unmarshal(request.GetData(), &joinReq)
 	if err != nil {
-		sendErrorResponse(request.GetConnection(), uint32(msg.S2C_JOIN_ROOM_ACK), "Invalid request data")
+		logger.ErrorLogger.Printf("Failed to unmarshal join room request: %v", err)
+		sendErrorResponse(request.GetConnection(), uint32(msg.MsgID_S2C_JOIN_ROOM_ACK), "Invalid request data")
 		return
 	}
+	logger.InfoLogger.Printf("Player %d requests to join room %d", request.GetConnection().GetConnID(), joinReq.RoomId)
 
 	// 2. 获取或创建房间
 	roomManager := server.GetRoomManager()
@@ -30,9 +34,11 @@ func (h *JoinRoomHandler) Handle(request ziface.IRequest) {
 		// 房间不存在，尝试创建
 		room, err = roomManager.CreateRoom(int32(joinReq.RoomId))
 		if err != nil {
-			sendErrorResponse(request.GetConnection(), uint32(msg.S2C_JOIN_ROOM_ACK), "Failed to create room")
+			logger.ErrorLogger.Printf("Failed to create room %d: %v", joinReq.RoomId, err)
+			sendErrorResponse(request.GetConnection(), uint32(msg.MsgID_S2C_JOIN_ROOM_ACK), "Failed to create room")
 			return
 		}
+		logger.InfoLogger.Printf("Room %d created", joinReq.RoomId)
 	}
 
 	// 3. 检查是否是重连
@@ -40,6 +46,7 @@ func (h *JoinRoomHandler) Handle(request ziface.IRequest) {
 	existingPlayer, err := room.GetPlayer(int64(playerID))
 	if err == nil && !existingPlayer.IsOnline() {
 		// 是重连玩家
+		logger.InfoLogger.Printf("Player %d reconnected to room %d", playerID, room.ID)
 		// T037: Re-associate connection with the existing Player object
 		existingPlayer.Conn = request.GetConnection()
 		existingPlayer.SetOnline(true)
@@ -54,14 +61,16 @@ func (h *JoinRoomHandler) Handle(request ziface.IRequest) {
 	}
 
 	// 4. 创建新玩家对象
-	player := logic.NewPlayer(int64(playerID), "Player"+string(playerID), request.GetConnection())
+	player := logic.NewPlayer(int64(playerID), fmt.Sprintf("Player%d", playerID), request.GetConnection())
 
 	// 5. 将玩家加入房间
 	err = room.AddPlayer(player)
 	if err != nil {
-		sendErrorResponse(request.GetConnection(), uint32(msg.S2C_JOIN_ROOM_ACK), err.Error())
+		logger.ErrorLogger.Printf("Failed to add player %d to room %d: %v", player.ID, room.ID, err)
+		sendErrorResponse(request.GetConnection(), uint32(msg.MsgID_S2C_JOIN_ROOM_ACK), err.Error())
 		return
 	}
+	logger.InfoLogger.Printf("Player %d joined room %d", player.ID, room.ID)
 
 	// 将 playerID 设置到连接属性中
 	request.GetConnection().SetProperty("playerID", player.ID)
@@ -71,18 +80,18 @@ func (h *JoinRoomHandler) Handle(request ziface.IRequest) {
 	joinAck := &msg.S2C_JoinRoomAck{
 		RetCode: 0,
 		RoomInfo: &msg.RoomInfo{
-			RoomId:    uint32(room.ID),
+			RoomId:    room.ID,
 			Players:   []*msg.PlayerInfo{},
 			GameState: msg.GameState(room.GetFSM().GetCurrentState()),
-			BankerId:  int64(room.GetBankerID()),
+			BankerId:  room.GetBankerID(),
 		},
 	}
 
 	for _, p := range room.GetPlayers() {
 		playerInfo := &msg.PlayerInfo{
-			PlayerId: uint64(p.ID),
+			PlayerId: p.ID,
 			Nickname: p.Nickname,
-			Score:    uint64(p.Score),
+			Score:    p.Score,
 			Status:   msg.PlayerStatus(p.GetStatus()),
 			IsBanker: p.IsBanker(),
 		}
@@ -91,13 +100,12 @@ func (h *JoinRoomHandler) Handle(request ziface.IRequest) {
 
 	ackData, err := json.Marshal(joinAck)
 	if err != nil {
-		sendErrorResponse(request.GetConnection(), uint32(msg.S2C_JOIN_ROOM_ACK), "Failed to marshal response")
+		sendErrorResponse(request.GetConnection(), uint32(msg.MsgID_S2C_JOIN_ROOM_ACK), "Failed to marshal response")
 		return
 	}
 
-	request.GetConnection().SendMsg(uint32(msg.S2C_JOIN_ROOM_ACK), ackData)
+	request.GetConnection().SendMsg(uint32(msg.MsgID_S2C_JOIN_ROOM_ACK), ackData)
 
 	// 7. 广播房间状态更新给所有玩家
 	broadcastRoomState(room)
 }
-

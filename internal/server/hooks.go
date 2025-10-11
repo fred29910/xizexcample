@@ -3,8 +3,6 @@ package server
 import (
 	"fmt"
 	"github.com/aceld/zinx/ziface"
-	"xizexcample/internal/logic"
-	"xizexcample/internal/server"
 )
 
 // OnConnStop is the handler for when a connection is closed
@@ -19,7 +17,7 @@ func OnConnStop(conn ziface.IConnection) {
 	}
 
 	// Find the room the player was in
-	room := server.RoomMgr.GetRoomByPlayerID(playerID.(int64))
+	room := GetRoomManager().GetRoomByPlayerID(playerID.(int64))
 	if room == nil {
 		fmt.Printf("OnConnStop: player %d was not in a room\n", playerID)
 		return
@@ -27,4 +25,7 @@ func OnConnStop(conn ziface.IConnection) {
 
 	// Mark the player as offline in the room
 	room.SetPlayerOffline(playerID.(int64))
+
+	// Unregister player from the room manager
+	GetRoomManager().UnregisterPlayer(playerID.(int64))
 }

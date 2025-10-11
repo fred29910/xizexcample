@@ -17,6 +17,9 @@ enum MsgID {
 
   // Server to Client
   S2C_JOIN_ROOM_ACK = 201;
+  S2C_BID_BANKER_ACK = 210; // 新增
+  S2C_PLACE_BET_ACK = 211; // 新增
+  S2C_SHOWDOWN_ACK = 212; // 新增
   S2C_SYNC_ROOM_STATE_NTF = 202;
   S2C_GAME_START_NTF = 203;
   S2C_DEAL_CARDS_NTF = 204;
@@ -136,6 +139,23 @@ message C2S_LeaveRoomReq {}
 message S2C_JoinRoomAck {
   int32 ret_code = 1; // 0 for success
   RoomInfo room_info = 2;
+}
+
+// 新增: S2C_BidBankerAck 响应客户端的抢庄请求
+message S2C_BidBankerAck {
+  int32 ret_code = 1;   // 0 for success
+  int64 player_id = 2;  // 成功抢到庄的玩家ID，如果ret_code非0则此字段无意义
+}
+
+// 新增: S2C_PlaceBetAck 响应客户端的下注请求
+message S2C_PlaceBetAck {
+  int32 ret_code = 1;   // 0 for success
+  int32 multiple = 2;   // 成功下注的倍数
+}
+
+// 新增: S2C_ShowdownAck 响应客户端的摊牌请求
+message S2C_ShowdownAck {
+  int32 ret_code = 1; // 0 for success
 }
 
 message RoomInfo {

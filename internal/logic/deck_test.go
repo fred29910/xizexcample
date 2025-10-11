@@ -1,8 +1,8 @@
 package logic
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func TestDeckNewDeck(t *testing.T) {

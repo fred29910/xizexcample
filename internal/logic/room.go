@@ -11,6 +11,7 @@ type Room struct {
 	ID      int32
 	Players map[int64]*Player // key: playerID
 	Deck    *Deck
+	FSM     *RoomFSM
 	mu      sync.RWMutex
 }
 
@@ -21,6 +22,7 @@ func NewRoom(roomID int32) *Room {
 		Players: make(map[int64]*Player),
 		Deck:    NewDeck(),
 	}
+	r.FSM = NewRoomFSM(r)
 	go r.startCleanupTimer()
 	return r
 }
@@ -57,6 +59,7 @@ func (r *Room) RemovePlayer(playerID int64) error {
 	delete(r.Players, playerID)
 	return nil
 }
+
 // SetPlayerOffline 将玩家标记为离线
 func (r *Room) SetPlayerOffline(playerID int64) {
 	r.mu.Lock()
@@ -172,6 +175,11 @@ func (r *Room) HasBanker() bool {
 		}
 	}
 	return false
+}
+
+// GetFSM 获取房间的状态机
+func (r *Room) GetFSM() *RoomFSM {
+	return r.FSM
 }
 
 // startCleanupTimer 启动一个定时器，定期清理断线的玩家

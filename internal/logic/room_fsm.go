@@ -3,6 +3,7 @@ package logic
 import (
 	"errors"
 	"fmt"
+	"xizexcample/internal/pkg/logger"
 )
 
 // GameState 游戏状态
@@ -39,14 +40,15 @@ func (fsm *RoomFSM) GetCurrentState() GameState {
 
 // TransitionTo 转换到新状态
 func (fsm *RoomFSM) TransitionTo(newState GameState) error {
+	oldState := fsm.currentState
 	// 定义状态转换规则
 	validTransitions := map[GameState][]GameState{
 		STATE_WAITING_FOR_PLAYERS: {STATE_DEALING},
-		STATE_DEALING:            {STATE_BIDDING},
-		STATE_BIDDING:            {STATE_BETTING},
-		STATE_BETTING:            {STATE_SHOWDOWN},
-		STATE_SHOWDOWN:           {STATE_SETTLEMENT},
-		STATE_SETTLEMENT:         {STATE_WAITING_FOR_PLAYERS}, // 一局结束后，等待下一局
+		STATE_DEALING:             {STATE_BIDDING},
+		STATE_BIDDING:             {STATE_BETTING},
+		STATE_BETTING:             {STATE_SHOWDOWN},
+		STATE_SHOWDOWN:            {STATE_SETTLEMENT},
+		STATE_SETTLEMENT:          {STATE_WAITING_FOR_PLAYERS}, // 一局结束后，等待下一局
 	}
 
 	// 检查转换是否有效
@@ -54,12 +56,15 @@ func (fsm *RoomFSM) TransitionTo(newState GameState) error {
 		for _, allowedState := range allowedStates {
 			if newState == allowedState {
 				fsm.currentState = newState
+				logger.InfoLogger.Printf("Room %d FSM transitioned from %d to %d", fsm.room.ID, oldState, newState)
 				return nil
 			}
 		}
 	}
 
-	return fmt.Errorf("invalid state transition from %d to %d", fsm.currentState, newState)
+	err := fmt.Errorf("invalid state transition from %d to %d", fsm.currentState, newState)
+	logger.ErrorLogger.Printf("Room %d FSM error: %v", fsm.room.ID, err)
+	return err
 }
 
 // CanStartGame 检查是否可以开始游戏
@@ -92,8 +97,7 @@ func (fsm *RoomFSM) DealCards() error {
 	for _, player := range fsm.room.GetPlayers() {
 		err := fsm.room.DealCardsToPlayer(player.ID, 5)
 		if err != nil {
-			// 记录错误，但继续给其他玩家发牌
-			// TODO: 添加日志
+			logger.ErrorLogger.Printf("Failed to deal cards to player %d in room %d: %v", player.ID, fsm.room.ID, err)
 			continue
 		}
 		// 更新玩家状态为 PLAYING

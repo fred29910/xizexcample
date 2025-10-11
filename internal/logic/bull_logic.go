@@ -8,20 +8,20 @@ import (
 type CardType int
 
 const (
-	CARD_TYPE_NO_BULL CardType = iota // 无牛
-	CARD_TYPE_BULL_1                  // 牛一
-	CARD_TYPE_BULL_2                  // 牛二
-	CARD_TYPE_BULL_3                  // 牛三
-	CARD_TYPE_BULL_4                  // 牛四
-	CARD_TYPE_BULL_5                  // 牛五
-	CARD_TYPE_BULL_6                  // 牛六
-	CARD_TYPE_BULL_7                  // 牛七
-	CARD_TYPE_BULL_8                  // 牛八
-	CARD_TYPE_BULL_9                  // 牛九
-	CARD_TYPE_BULL_BOMB               // 牛牛 (炸弹)
-	CARD_TYPE_FIVE_SMALL               // 五小牛
-	CARD_TYPE_BOMB                    // 炸弹 (四张相同)
-	CARD_TYPE_GOLDEN_FLOWER           // 金花 (同花顺)
+	CARD_TYPE_NO_BULL       CardType = iota // 无牛
+	CARD_TYPE_BULL_1                        // 牛一
+	CARD_TYPE_BULL_2                        // 牛二
+	CARD_TYPE_BULL_3                        // 牛三
+	CARD_TYPE_BULL_4                        // 牛四
+	CARD_TYPE_BULL_5                        // 牛五
+	CARD_TYPE_BULL_6                        // 牛六
+	CARD_TYPE_BULL_7                        // 牛七
+	CARD_TYPE_BULL_8                        // 牛八
+	CARD_TYPE_BULL_9                        // 牛九
+	CARD_TYPE_BULL_BOMB                     // 牛牛 (炸弹)
+	CARD_TYPE_FIVE_SMALL                    // 五小牛
+	CARD_TYPE_BOMB                          // 炸弹 (四张相同)
+	CARD_TYPE_GOLDEN_FLOWER                 // 金花 (同花顺)
 )
 
 // CalculateBull 计算牛牛牌型和牛值
@@ -39,7 +39,7 @@ func CalculateBull(cards []*Card) (CardType, uint32) {
 	for i := 0; i < 3; i++ {
 		for j := i + 1; j < 4; j++ {
 			for k := j + 1; k < 5; k++ {
-				if (cards[i].Value() + cards[j].Value() + cards[k].Value())%10 == 0 {
+				if (cards[i].Value()+cards[j].Value()+cards[k].Value())%10 == 0 {
 					// 有牛，计算剩余两张牌的点数
 					remainingSum := 0
 					for idx, card := range cards {

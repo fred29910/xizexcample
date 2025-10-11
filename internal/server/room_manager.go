@@ -15,7 +15,7 @@ var (
 // RoomManager 房间管理器
 type RoomManager struct {
 	rooms      map[int32]*logic.Room // key: roomID
-	playerRoom map[int64]int32     // key: playerID, value: roomID
+	playerRoom map[int64]int32       // key: playerID, value: roomID
 	mu         sync.RWMutex
 }
 

@@ -1,8 +1,8 @@
 package logic
 
 import (
-	"sync"
 	"github.com/aceld/zinx/ziface"
+	"sync"
 )
 
 // Player 表示一个玩家
@@ -19,7 +19,7 @@ type Player struct {
 	isBanker  bool
 
 	// 连接相关
-	IsOnline       bool
+	isOnline       bool
 	Conn           ziface.IConnection
 	DisconnectTime int64 // Unix timestamp
 
@@ -35,7 +35,7 @@ func NewPlayer(id int64, nickname string, conn ziface.IConnection) *Player {
 		RoomID:   0,
 		Hand:     make([]Card, 0),
 		Status:   STATUS_WAITING,
-		IsOnline: true,
+		isOnline: true,
 		Conn:     conn,
 	}
 }
@@ -50,21 +50,22 @@ func (p *Player) SetStatus(status PlayerStatus) {
 // GetStatus 获取玩家状态
 func (p *Player) GetStatus() PlayerStatus {
 	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return p.Status
+}
+
 // SetOnline 设置玩家在线状态
 func (p *Player) SetOnline(online bool) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	p.IsOnline = online
+	p.isOnline = online
 }
 
 // IsOnline 检查玩家是否在线
 func (p *Player) IsOnline() bool {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	return p.IsOnline
-}
-	defer p.mu.RUnlock()
-	return p.Status
+	return p.isOnline
 }
 
 // AddCard 给玩家发一张牌

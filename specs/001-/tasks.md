@@ -101,15 +101,15 @@
 
 ### Tests for User Story 3 (MANDATORY)
 
-- [ ] T034 [US1] E2E test for disconnect and reconnect flow in `tests/e2e/reconnect_test.go`.
+- [x] T034 [US1] E2E test for disconnect and reconnect flow in `tests/e2e/reconnect_test.go`.
 
 ### Implementation for User Story 3
 
-- [ ] T035 [US3] In the Zinx `OnConnStop` hook, mark the player as disconnected instead of removing them from the room immediately.
-- [ ] T036 [US3] When a player sends `C2S_JoinRoomReq`, check if they have a disconnected session in that room.
-- [ ] T037 [US3] If they are reconnecting, re-associate their new connection with their existing `Player` object.
-- [ ] T038 [US3] Implement a function to generate and send a full room state synchronization message to the reconnected player.
-- [ ] T039 [US3] Add a timer to clean up disconnected players from a room if they do not reconnect within a specified time limit (e.g., 5 minutes).
+- [x] T035 [US3] In the Zinx `OnConnStop` hook, mark the player as disconnected instead of removing them from the room immediately.
+- [x] T036 [US3] When a player sends `C2S_JoinRoomReq`, check if they have a disconnected session in that room.
+- [x] T037 [US3] If they are reconnecting, re-associate their new connection with their existing `Player` object.
+- [x] T038 [US3] Implement a function to generate and send a full room state synchronization message to the reconnected player.
+- [x] T039 [US3] Add a timer to clean up disconnected players from a room if they do not reconnect within a specified time limit (e.g., 5 minutes).
 
 ---
 

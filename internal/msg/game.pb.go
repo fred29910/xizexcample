@@ -35,6 +35,9 @@ const (
 	MsgID_C2S_LEAVE_ROOM_REQ   MsgID = 106
 	// Server to Client
 	MsgID_S2C_JOIN_ROOM_ACK       MsgID = 201
+	MsgID_S2C_BID_BANKER_ACK      MsgID = 210 // 新增
+	MsgID_S2C_PLACE_BET_ACK       MsgID = 211 // 新增
+	MsgID_S2C_SHOWDOWN_ACK        MsgID = 212 // 新增
 	MsgID_S2C_SYNC_ROOM_STATE_NTF MsgID = 202
 	MsgID_S2C_GAME_START_NTF      MsgID = 203
 	MsgID_S2C_DEAL_CARDS_NTF      MsgID = 204
@@ -56,6 +59,9 @@ var (
 		105: "C2S_SHOWDOWN_REQ",
 		106: "C2S_LEAVE_ROOM_REQ",
 		201: "S2C_JOIN_ROOM_ACK",
+		210: "S2C_BID_BANKER_ACK",
+		211: "S2C_PLACE_BET_ACK",
+		212: "S2C_SHOWDOWN_ACK",
 		202: "S2C_SYNC_ROOM_STATE_NTF",
 		203: "S2C_GAME_START_NTF",
 		204: "S2C_DEAL_CARDS_NTF",
@@ -74,6 +80,9 @@ var (
 		"C2S_SHOWDOWN_REQ":        105,
 		"C2S_LEAVE_ROOM_REQ":      106,
 		"S2C_JOIN_ROOM_ACK":       201,
+		"S2C_BID_BANKER_ACK":      210,
+		"S2C_PLACE_BET_ACK":       211,
+		"S2C_SHOWDOWN_ACK":        212,
 		"S2C_SYNC_ROOM_STATE_NTF": 202,
 		"S2C_GAME_START_NTF":      203,
 		"S2C_DEAL_CARDS_NTF":      204,
@@ -908,6 +917,157 @@ func (x *S2C_JoinRoomAck) GetRoomInfo() *RoomInfo {
 	return nil
 }
 
+// 新增: S2C_BidBankerAck 响应客户端的抢庄请求
+type S2C_BidBankerAck struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RetCode       int32                  `protobuf:"varint,1,opt,name=ret_code,json=retCode,proto3" json:"ret_code,omitempty"`    // 0 for success
+	PlayerId      int64                  `protobuf:"varint,2,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` // 成功抢到庄的玩家ID，如果ret_code非0则此字段无意义
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *S2C_BidBankerAck) Reset() {
+	*x = S2C_BidBankerAck{}
+	mi := &file_api_proto_game_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *S2C_BidBankerAck) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*S2C_BidBankerAck) ProtoMessage() {}
+
+func (x *S2C_BidBankerAck) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_game_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use S2C_BidBankerAck.ProtoReflect.Descriptor instead.
+func (*S2C_BidBankerAck) Descriptor() ([]byte, []int) {
+	return file_api_proto_game_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *S2C_BidBankerAck) GetRetCode() int32 {
+	if x != nil {
+		return x.RetCode
+	}
+	return 0
+}
+
+func (x *S2C_BidBankerAck) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+// 新增: S2C_PlaceBetAck 响应客户端的下注请求
+type S2C_PlaceBetAck struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RetCode       int32                  `protobuf:"varint,1,opt,name=ret_code,json=retCode,proto3" json:"ret_code,omitempty"` // 0 for success
+	Multiple      int32                  `protobuf:"varint,2,opt,name=multiple,proto3" json:"multiple,omitempty"`              // 成功下注的倍数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *S2C_PlaceBetAck) Reset() {
+	*x = S2C_PlaceBetAck{}
+	mi := &file_api_proto_game_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *S2C_PlaceBetAck) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*S2C_PlaceBetAck) ProtoMessage() {}
+
+func (x *S2C_PlaceBetAck) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_game_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use S2C_PlaceBetAck.ProtoReflect.Descriptor instead.
+func (*S2C_PlaceBetAck) Descriptor() ([]byte, []int) {
+	return file_api_proto_game_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *S2C_PlaceBetAck) GetRetCode() int32 {
+	if x != nil {
+		return x.RetCode
+	}
+	return 0
+}
+
+func (x *S2C_PlaceBetAck) GetMultiple() int32 {
+	if x != nil {
+		return x.Multiple
+	}
+	return 0
+}
+
+// 新增: S2C_ShowdownAck 响应客户端的摊牌请求
+type S2C_ShowdownAck struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RetCode       int32                  `protobuf:"varint,1,opt,name=ret_code,json=retCode,proto3" json:"ret_code,omitempty"` // 0 for success
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *S2C_ShowdownAck) Reset() {
+	*x = S2C_ShowdownAck{}
+	mi := &file_api_proto_game_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *S2C_ShowdownAck) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*S2C_ShowdownAck) ProtoMessage() {}
+
+func (x *S2C_ShowdownAck) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_game_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use S2C_ShowdownAck.ProtoReflect.Descriptor instead.
+func (*S2C_ShowdownAck) Descriptor() ([]byte, []int) {
+	return file_api_proto_game_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *S2C_ShowdownAck) GetRetCode() int32 {
+	if x != nil {
+		return x.RetCode
+	}
+	return 0
+}
+
 type RoomInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RoomId        int32                  `protobuf:"varint,1,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
@@ -920,7 +1080,7 @@ type RoomInfo struct {
 
 func (x *RoomInfo) Reset() {
 	*x = RoomInfo{}
-	mi := &file_api_proto_game_proto_msgTypes[9]
+	mi := &file_api_proto_game_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -932,7 +1092,7 @@ func (x *RoomInfo) String() string {
 func (*RoomInfo) ProtoMessage() {}
 
 func (x *RoomInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_game_proto_msgTypes[9]
+	mi := &file_api_proto_game_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -945,7 +1105,7 @@ func (x *RoomInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoomInfo.ProtoReflect.Descriptor instead.
 func (*RoomInfo) Descriptor() ([]byte, []int) {
-	return file_api_proto_game_proto_rawDescGZIP(), []int{9}
+	return file_api_proto_game_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *RoomInfo) GetRoomId() int32 {
@@ -985,7 +1145,7 @@ type S2C_SyncRoomStateNtf struct {
 
 func (x *S2C_SyncRoomStateNtf) Reset() {
 	*x = S2C_SyncRoomStateNtf{}
-	mi := &file_api_proto_game_proto_msgTypes[10]
+	mi := &file_api_proto_game_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -997,7 +1157,7 @@ func (x *S2C_SyncRoomStateNtf) String() string {
 func (*S2C_SyncRoomStateNtf) ProtoMessage() {}
 
 func (x *S2C_SyncRoomStateNtf) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_game_proto_msgTypes[10]
+	mi := &file_api_proto_game_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1010,7 +1170,7 @@ func (x *S2C_SyncRoomStateNtf) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use S2C_SyncRoomStateNtf.ProtoReflect.Descriptor instead.
 func (*S2C_SyncRoomStateNtf) Descriptor() ([]byte, []int) {
-	return file_api_proto_game_proto_rawDescGZIP(), []int{10}
+	return file_api_proto_game_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *S2C_SyncRoomStateNtf) GetRoomInfo() *RoomInfo {
@@ -1029,7 +1189,7 @@ type S2C_GameStartNtf struct {
 
 func (x *S2C_GameStartNtf) Reset() {
 	*x = S2C_GameStartNtf{}
-	mi := &file_api_proto_game_proto_msgTypes[11]
+	mi := &file_api_proto_game_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1041,7 +1201,7 @@ func (x *S2C_GameStartNtf) String() string {
 func (*S2C_GameStartNtf) ProtoMessage() {}
 
 func (x *S2C_GameStartNtf) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_game_proto_msgTypes[11]
+	mi := &file_api_proto_game_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1054,7 +1214,7 @@ func (x *S2C_GameStartNtf) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use S2C_GameStartNtf.ProtoReflect.Descriptor instead.
 func (*S2C_GameStartNtf) Descriptor() ([]byte, []int) {
-	return file_api_proto_game_proto_rawDescGZIP(), []int{11}
+	return file_api_proto_game_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *S2C_GameStartNtf) GetBankerId() int64 {
@@ -1073,7 +1233,7 @@ type S2C_DealCardsNtf struct {
 
 func (x *S2C_DealCardsNtf) Reset() {
 	*x = S2C_DealCardsNtf{}
-	mi := &file_api_proto_game_proto_msgTypes[12]
+	mi := &file_api_proto_game_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1085,7 +1245,7 @@ func (x *S2C_DealCardsNtf) String() string {
 func (*S2C_DealCardsNtf) ProtoMessage() {}
 
 func (x *S2C_DealCardsNtf) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_game_proto_msgTypes[12]
+	mi := &file_api_proto_game_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1098,7 +1258,7 @@ func (x *S2C_DealCardsNtf) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use S2C_DealCardsNtf.ProtoReflect.Descriptor instead.
 func (*S2C_DealCardsNtf) Descriptor() ([]byte, []int) {
-	return file_api_proto_game_proto_rawDescGZIP(), []int{12}
+	return file_api_proto_game_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *S2C_DealCardsNtf) GetHand() []*Card {
@@ -1117,7 +1277,7 @@ type S2C_BidBankerNtf struct {
 
 func (x *S2C_BidBankerNtf) Reset() {
 	*x = S2C_BidBankerNtf{}
-	mi := &file_api_proto_game_proto_msgTypes[13]
+	mi := &file_api_proto_game_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1129,7 +1289,7 @@ func (x *S2C_BidBankerNtf) String() string {
 func (*S2C_BidBankerNtf) ProtoMessage() {}
 
 func (x *S2C_BidBankerNtf) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_game_proto_msgTypes[13]
+	mi := &file_api_proto_game_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1142,7 +1302,7 @@ func (x *S2C_BidBankerNtf) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use S2C_BidBankerNtf.ProtoReflect.Descriptor instead.
 func (*S2C_BidBankerNtf) Descriptor() ([]byte, []int) {
-	return file_api_proto_game_proto_rawDescGZIP(), []int{13}
+	return file_api_proto_game_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *S2C_BidBankerNtf) GetCountdown() int32 {
@@ -1162,7 +1322,7 @@ type S2C_BetNtf struct {
 
 func (x *S2C_BetNtf) Reset() {
 	*x = S2C_BetNtf{}
-	mi := &file_api_proto_game_proto_msgTypes[14]
+	mi := &file_api_proto_game_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1174,7 +1334,7 @@ func (x *S2C_BetNtf) String() string {
 func (*S2C_BetNtf) ProtoMessage() {}
 
 func (x *S2C_BetNtf) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_game_proto_msgTypes[14]
+	mi := &file_api_proto_game_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1187,7 +1347,7 @@ func (x *S2C_BetNtf) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use S2C_BetNtf.ProtoReflect.Descriptor instead.
 func (*S2C_BetNtf) Descriptor() ([]byte, []int) {
-	return file_api_proto_game_proto_rawDescGZIP(), []int{14}
+	return file_api_proto_game_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *S2C_BetNtf) GetBankerId() int64 {
@@ -1213,7 +1373,7 @@ type S2C_ShowdownNtf struct {
 
 func (x *S2C_ShowdownNtf) Reset() {
 	*x = S2C_ShowdownNtf{}
-	mi := &file_api_proto_game_proto_msgTypes[15]
+	mi := &file_api_proto_game_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1225,7 +1385,7 @@ func (x *S2C_ShowdownNtf) String() string {
 func (*S2C_ShowdownNtf) ProtoMessage() {}
 
 func (x *S2C_ShowdownNtf) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_game_proto_msgTypes[15]
+	mi := &file_api_proto_game_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1238,7 +1398,7 @@ func (x *S2C_ShowdownNtf) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use S2C_ShowdownNtf.ProtoReflect.Descriptor instead.
 func (*S2C_ShowdownNtf) Descriptor() ([]byte, []int) {
-	return file_api_proto_game_proto_rawDescGZIP(), []int{15}
+	return file_api_proto_game_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *S2C_ShowdownNtf) GetCountdown() int32 {
@@ -1261,7 +1421,7 @@ type PlayerResult struct {
 
 func (x *PlayerResult) Reset() {
 	*x = PlayerResult{}
-	mi := &file_api_proto_game_proto_msgTypes[16]
+	mi := &file_api_proto_game_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1273,7 +1433,7 @@ func (x *PlayerResult) String() string {
 func (*PlayerResult) ProtoMessage() {}
 
 func (x *PlayerResult) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_game_proto_msgTypes[16]
+	mi := &file_api_proto_game_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1286,7 +1446,7 @@ func (x *PlayerResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlayerResult.ProtoReflect.Descriptor instead.
 func (*PlayerResult) Descriptor() ([]byte, []int) {
-	return file_api_proto_game_proto_rawDescGZIP(), []int{16}
+	return file_api_proto_game_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *PlayerResult) GetPlayerId() int64 {
@@ -1333,7 +1493,7 @@ type S2C_GameResultNtf struct {
 
 func (x *S2C_GameResultNtf) Reset() {
 	*x = S2C_GameResultNtf{}
-	mi := &file_api_proto_game_proto_msgTypes[17]
+	mi := &file_api_proto_game_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1345,7 +1505,7 @@ func (x *S2C_GameResultNtf) String() string {
 func (*S2C_GameResultNtf) ProtoMessage() {}
 
 func (x *S2C_GameResultNtf) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_game_proto_msgTypes[17]
+	mi := &file_api_proto_game_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1358,7 +1518,7 @@ func (x *S2C_GameResultNtf) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use S2C_GameResultNtf.ProtoReflect.Descriptor instead.
 func (*S2C_GameResultNtf) Descriptor() ([]byte, []int) {
-	return file_api_proto_game_proto_rawDescGZIP(), []int{17}
+	return file_api_proto_game_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *S2C_GameResultNtf) GetResults() []*PlayerResult {
@@ -1377,7 +1537,7 @@ type S2C_PlayerLeaveNtf struct {
 
 func (x *S2C_PlayerLeaveNtf) Reset() {
 	*x = S2C_PlayerLeaveNtf{}
-	mi := &file_api_proto_game_proto_msgTypes[18]
+	mi := &file_api_proto_game_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1389,7 +1549,7 @@ func (x *S2C_PlayerLeaveNtf) String() string {
 func (*S2C_PlayerLeaveNtf) ProtoMessage() {}
 
 func (x *S2C_PlayerLeaveNtf) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_game_proto_msgTypes[18]
+	mi := &file_api_proto_game_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1402,7 +1562,7 @@ func (x *S2C_PlayerLeaveNtf) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use S2C_PlayerLeaveNtf.ProtoReflect.Descriptor instead.
 func (*S2C_PlayerLeaveNtf) Descriptor() ([]byte, []int) {
-	return file_api_proto_game_proto_rawDescGZIP(), []int{18}
+	return file_api_proto_game_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *S2C_PlayerLeaveNtf) GetPlayerId() int64 {
@@ -1447,7 +1607,15 @@ const file_api_proto_game_proto_rawDesc = "" +
 	"\x10C2S_LeaveRoomReq\"Y\n" +
 	"\x0fS2C_JoinRoomAck\x12\x19\n" +
 	"\bret_code\x18\x01 \x01(\x05R\aretCode\x12+\n" +
-	"\troom_info\x18\x02 \x01(\v2\x0e.game.RoomInfoR\broomInfo\"\x9c\x01\n" +
+	"\troom_info\x18\x02 \x01(\v2\x0e.game.RoomInfoR\broomInfo\"J\n" +
+	"\x10S2C_BidBankerAck\x12\x19\n" +
+	"\bret_code\x18\x01 \x01(\x05R\aretCode\x12\x1b\n" +
+	"\tplayer_id\x18\x02 \x01(\x03R\bplayerId\"H\n" +
+	"\x0fS2C_PlaceBetAck\x12\x19\n" +
+	"\bret_code\x18\x01 \x01(\x05R\aretCode\x12\x1a\n" +
+	"\bmultiple\x18\x02 \x01(\x05R\bmultiple\",\n" +
+	"\x0fS2C_ShowdownAck\x12\x19\n" +
+	"\bret_code\x18\x01 \x01(\x05R\aretCode\"\x9c\x01\n" +
 	"\bRoomInfo\x12\x17\n" +
 	"\aroom_id\x18\x01 \x01(\x05R\x06roomId\x12*\n" +
 	"\aplayers\x18\x02 \x03(\v2\x10.game.PlayerInfoR\aplayers\x12.\n" +
@@ -1480,7 +1648,7 @@ const file_api_proto_game_proto_rawDesc = "" +
 	"\x11S2C_GameResultNtf\x12,\n" +
 	"\aresults\x18\x01 \x03(\v2\x12.game.PlayerResultR\aresults\"1\n" +
 	"\x12S2C_PlayerLeaveNtf\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId*\x81\x03\n" +
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId*\xc9\x03\n" +
 	"\x05MsgID\x12\v\n" +
 	"\aUNKNOWN\x10\x00\x12\x15\n" +
 	"\x11C2S_JOIN_ROOM_REQ\x10e\x12\x18\n" +
@@ -1489,7 +1657,10 @@ const file_api_proto_game_proto_rawDesc = "" +
 	"\x11C2S_PLACE_BET_REQ\x10h\x12\x14\n" +
 	"\x10C2S_SHOWDOWN_REQ\x10i\x12\x16\n" +
 	"\x12C2S_LEAVE_ROOM_REQ\x10j\x12\x16\n" +
-	"\x11S2C_JOIN_ROOM_ACK\x10\xc9\x01\x12\x1c\n" +
+	"\x11S2C_JOIN_ROOM_ACK\x10\xc9\x01\x12\x17\n" +
+	"\x12S2C_BID_BANKER_ACK\x10\xd2\x01\x12\x16\n" +
+	"\x11S2C_PLACE_BET_ACK\x10\xd3\x01\x12\x15\n" +
+	"\x10S2C_SHOWDOWN_ACK\x10\xd4\x01\x12\x1c\n" +
 	"\x17S2C_SYNC_ROOM_STATE_NTF\x10\xca\x01\x12\x17\n" +
 	"\x12S2C_GAME_START_NTF\x10\xcb\x01\x12\x17\n" +
 	"\x12S2C_DEAL_CARDS_NTF\x10\xcc\x01\x12\x17\n" +
@@ -1568,7 +1739,7 @@ func file_api_proto_game_proto_rawDescGZIP() []byte {
 }
 
 var file_api_proto_game_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_api_proto_game_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_api_proto_game_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_api_proto_game_proto_goTypes = []any{
 	(MsgID)(0),                   // 0: game.MsgID
 	(Suit)(0),                    // 1: game.Suit
@@ -1585,16 +1756,19 @@ var file_api_proto_game_proto_goTypes = []any{
 	(*C2S_ShowdownReq)(nil),      // 12: game.C2S_ShowdownReq
 	(*C2S_LeaveRoomReq)(nil),     // 13: game.C2S_LeaveRoomReq
 	(*S2C_JoinRoomAck)(nil),      // 14: game.S2C_JoinRoomAck
-	(*RoomInfo)(nil),             // 15: game.RoomInfo
-	(*S2C_SyncRoomStateNtf)(nil), // 16: game.S2C_SyncRoomStateNtf
-	(*S2C_GameStartNtf)(nil),     // 17: game.S2C_GameStartNtf
-	(*S2C_DealCardsNtf)(nil),     // 18: game.S2C_DealCardsNtf
-	(*S2C_BidBankerNtf)(nil),     // 19: game.S2C_BidBankerNtf
-	(*S2C_BetNtf)(nil),           // 20: game.S2C_BetNtf
-	(*S2C_ShowdownNtf)(nil),      // 21: game.S2C_ShowdownNtf
-	(*PlayerResult)(nil),         // 22: game.PlayerResult
-	(*S2C_GameResultNtf)(nil),    // 23: game.S2C_GameResultNtf
-	(*S2C_PlayerLeaveNtf)(nil),   // 24: game.S2C_PlayerLeaveNtf
+	(*S2C_BidBankerAck)(nil),     // 15: game.S2C_BidBankerAck
+	(*S2C_PlaceBetAck)(nil),      // 16: game.S2C_PlaceBetAck
+	(*S2C_ShowdownAck)(nil),      // 17: game.S2C_ShowdownAck
+	(*RoomInfo)(nil),             // 18: game.RoomInfo
+	(*S2C_SyncRoomStateNtf)(nil), // 19: game.S2C_SyncRoomStateNtf
+	(*S2C_GameStartNtf)(nil),     // 20: game.S2C_GameStartNtf
+	(*S2C_DealCardsNtf)(nil),     // 21: game.S2C_DealCardsNtf
+	(*S2C_BidBankerNtf)(nil),     // 22: game.S2C_BidBankerNtf
+	(*S2C_BetNtf)(nil),           // 23: game.S2C_BetNtf
+	(*S2C_ShowdownNtf)(nil),      // 24: game.S2C_ShowdownNtf
+	(*PlayerResult)(nil),         // 25: game.PlayerResult
+	(*S2C_GameResultNtf)(nil),    // 26: game.S2C_GameResultNtf
+	(*S2C_PlayerLeaveNtf)(nil),   // 27: game.S2C_PlayerLeaveNtf
 }
 var file_api_proto_game_proto_depIdxs = []int32{
 	1,  // 0: game.Card.suit:type_name -> game.Suit
@@ -1603,14 +1777,14 @@ var file_api_proto_game_proto_depIdxs = []int32{
 	6,  // 3: game.PlayerInfo.hand:type_name -> game.Card
 	3,  // 4: game.PlayerInfo.card_pattern:type_name -> game.CardPattern
 	6,  // 5: game.C2S_ShowdownReq.sorted_hand:type_name -> game.Card
-	15, // 6: game.S2C_JoinRoomAck.room_info:type_name -> game.RoomInfo
+	18, // 6: game.S2C_JoinRoomAck.room_info:type_name -> game.RoomInfo
 	7,  // 7: game.RoomInfo.players:type_name -> game.PlayerInfo
 	5,  // 8: game.RoomInfo.game_state:type_name -> game.GameState
-	15, // 9: game.S2C_SyncRoomStateNtf.room_info:type_name -> game.RoomInfo
+	18, // 9: game.S2C_SyncRoomStateNtf.room_info:type_name -> game.RoomInfo
 	6,  // 10: game.S2C_DealCardsNtf.hand:type_name -> game.Card
 	6,  // 11: game.PlayerResult.hand:type_name -> game.Card
 	3,  // 12: game.PlayerResult.card_pattern:type_name -> game.CardPattern
-	22, // 13: game.S2C_GameResultNtf.results:type_name -> game.PlayerResult
+	25, // 13: game.S2C_GameResultNtf.results:type_name -> game.PlayerResult
 	14, // [14:14] is the sub-list for method output_type
 	14, // [14:14] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name
@@ -1629,7 +1803,7 @@ func file_api_proto_game_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_proto_game_proto_rawDesc), len(file_api_proto_game_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   19,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
