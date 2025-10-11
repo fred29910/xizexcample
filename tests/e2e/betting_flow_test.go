@@ -2,7 +2,6 @@ package e2e
 
 import (
 	"testing"
-	"time"
 )
 
 // 这是一个 E2E 测试的占位符。

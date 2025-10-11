@@ -15,8 +15,8 @@ func TestRoomFSMBidBanker(t *testing.T) {
 	}
 
 	// 模拟完整的状态流
-	room.AddPlayer(NewPlayer(1, "p1"))
-	room.AddPlayer(NewPlayer(2, "p2"))
+	room.AddPlayer(NewPlayer(1, "p1", nil))
+	room.AddPlayer(NewPlayer(2, "p2", nil))
 	err = fsm.StartGame()
 	if err != nil {
 		t.Fatalf("StartGame failed: %v", err)
@@ -48,8 +48,8 @@ func TestRoomFSMPlaceBet(t *testing.T) {
 	}
 
 	// 模拟完整的状态流
-	room.AddPlayer(NewPlayer(1, "p1"))
-	room.AddPlayer(NewPlayer(2, "p2"))
+	room.AddPlayer(NewPlayer(1, "p1", nil))
+	room.AddPlayer(NewPlayer(2, "p2", nil))
 	fsm.StartGame()
 	fsm.DealCards()
 	fsm.BidBanker()
@@ -76,8 +76,8 @@ func TestRoomFSMShowdown(t *testing.T) {
 	}
 
 	// 模拟完整的状态流
-	room.AddPlayer(NewPlayer(1, "p1"))
-	room.AddPlayer(NewPlayer(2, "p2"))
+	room.AddPlayer(NewPlayer(1, "p1", nil))
+	room.AddPlayer(NewPlayer(2, "p2", nil))
 	fsm.StartGame()
 	fsm.DealCards()
 	fsm.BidBanker()
@@ -105,8 +105,8 @@ func TestRoomFSMSettlement(t *testing.T) {
 	}
 
 	// 模拟完整的状态流
-	room.AddPlayer(NewPlayer(1, "p1"))
-	room.AddPlayer(NewPlayer(2, "p2"))
+	room.AddPlayer(NewPlayer(1, "p1", nil))
+	room.AddPlayer(NewPlayer(2, "p2", nil))
 	fsm.StartGame()
 	fsm.DealCards()
 	fsm.BidBanker()

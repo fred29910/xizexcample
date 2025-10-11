@@ -6,8 +6,8 @@ import (
 
 func TestRoomAddPlayer(t *testing.T) {
 	room := NewRoom(201)
-	player1 := NewPlayer(1001, "Player1")
-	player2 := NewPlayer(1002, "Player2")
+	player1 := NewPlayer(1001, "Player1", nil)
+	player2 := NewPlayer(1002, "Player2", nil)
 
 	// 测试添加第一个玩家
 	err := room.AddPlayer(player1)
@@ -40,10 +40,10 @@ func TestRoomAddPlayer(t *testing.T) {
 	}
 
 	// 测试房间已满
-	player3 := NewPlayer(1003, "Player3")
-	player4 := NewPlayer(1004, "Player4")
-	player5 := NewPlayer(1005, "Player5")
-	player6 := NewPlayer(1006, "Player6")
+	player3 := NewPlayer(1003, "Player3", nil)
+	player4 := NewPlayer(1004, "Player4", nil)
+	player5 := NewPlayer(1005, "Player5", nil)
+	player6 := NewPlayer(1006, "Player6", nil)
 
 	room.AddPlayer(player3)
 	room.AddPlayer(player4)
@@ -57,8 +57,8 @@ func TestRoomAddPlayer(t *testing.T) {
 
 func TestRoomRemovePlayer(t *testing.T) {
 	room := NewRoom(202)
-	player1 := NewPlayer(1007, "Player1")
-	player2 := NewPlayer(1008, "Player2")
+	player1 := NewPlayer(1007, "Player1", nil)
+	player2 := NewPlayer(1008, "Player2", nil)
 
 	room.AddPlayer(player1)
 	room.AddPlayer(player2)
@@ -96,7 +96,7 @@ func TestRoomRemovePlayer(t *testing.T) {
 
 func TestRoomGetPlayer(t *testing.T) {
 	room := NewRoom(203)
-	player1 := NewPlayer(1009, "Player1")
+	player1 := NewPlayer(1009, "Player1", nil)
 
 	room.AddPlayer(player1)
 
