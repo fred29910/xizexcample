@@ -1,0 +1,181 @@
+openapi: 3.0.3
+info:
+  title: Xizexcample Backend APIs
+  version: 0.1.0
+  description: REST APIs powered by Gin. JWT Bearer auth. Aligns with docs/plan.md tasks.
+servers:
+  - url: http://localhost:8080
+    description: Local Dev
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        code: { type: integer, example: 1001 }
+        message: { type: string, example: InvalidParam }
+    User:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        username: { type: string }
+        nickname: { type: string }
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+    LoginResponse:
+      type: object
+      properties:
+        token: { type: string, description: JWT token }
+    RegisterRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+        nickname: { type: string }
+    FriendRequest:
+      type: object
+      required: [to_user_id]
+      properties:
+        to_user_id: { type: integer, format: int64 }
+    FriendAccept:
+      type: object
+      required: [request_id]
+      properties:
+        request_id: { type: integer, format: int64 }
+    InventoryItem:
+      type: object
+      properties:
+        item_id: { type: string }
+        quantity: { type: integer }
+    InventoryPatch:
+      type: object
+      required: [item_id, delta]
+      properties:
+        item_id: { type: string }
+        delta: { type: integer, description: can be negative }
+    PaymentOrder:
+      type: object
+      required: [amount, channel]
+      properties:
+        amount: { type: integer, format: int64 }
+        channel: { type: string, enum: [mock, stripe, alipay, wechatpay] }
+    PaymentOrderResp:
+      type: object
+      properties:
+        order_id: { type: string }
+paths:
+  /api/v1/users/register:
+    post:
+      tags: [users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '400': { description: bad request, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /api/v1/users/login:
+    post:
+      tags: [users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '401': { description: unauthorized, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /api/v1/users/me:
+    get:
+      tags: [users]
+      security:
+        - bearerAuth: []
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/User' } } } }
+        '401': { description: unauthorized, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /api/v1/friends/requests:
+    post:
+      tags: [friends]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FriendRequest' }
+      responses:
+        '200': { description: ok }
+        '401': { description: unauthorized }
+  /api/v1/friends/accept:
+    post:
+      tags: [friends]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FriendAccept' }
+      responses:
+        '200': { description: ok }
+        '401': { description: unauthorized }
+  /api/v1/inventories:
+    get:
+      tags: [inventory]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/InventoryItem' }
+    patch:
+      tags: [inventory]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InventoryPatch' }
+      responses:
+        '200': { description: ok }
+        '400': { description: bad request }
+        '401': { description: unauthorized }
+  /api/v1/payments/orders:
+    post:
+      tags: [payments]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PaymentOrder' }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/PaymentOrderResp' } } } }
+        '401': { description: unauthorized }
+        '422': { description: invalid }

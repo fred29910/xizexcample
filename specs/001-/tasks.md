@@ -112,10 +112,3 @@
 - [x] T039 [US3] Add a timer to clean up disconnected players from a room if they do not reconnect within a specified time limit (e.g., 5 minutes).
 
 ---
-
-## Phase N: Polish & Cross-Cutting Concerns
-
-- [ ] T040 [P] Add detailed logging for all major game events.
-- [ ] T041 [P] Implement configuration management (`internal/conf/`) to handle server port, timeouts, etc.
-- [ ] T042 Code cleanup and refactoring based on review feedback.
-- [ ] T043 Run `go fmt` and `golint` across the entire codebase to ensure compliance with the constitution.
